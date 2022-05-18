@@ -127,7 +127,8 @@ class ViewController: UIViewController {
         pokemonNumber += 1
     }
     @objc func reloadTapped(_ sender: UIButton) {
-        print("reloadTapped")
+        pokemonNumber = 2
+        self.initializeView()
         
     }
     private func initializeView() {
