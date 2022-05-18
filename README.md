@@ -18,4 +18,8 @@ In this task, I have used https://pokeapi.co to get our data.
  ## Loading Screen 
  
   <img src="loadingScreen.png" alt="My Project GIF" width="200">
+  
+  ### Contact
+
+Questions? Feel free to [email us](mailto:dogukaninci93@gmail.com?subject=Come%20E%20Start%20Tomorrow) and I’ll answer ASAP.
 
