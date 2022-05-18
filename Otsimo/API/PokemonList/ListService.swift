@@ -1,7 +1,7 @@
 import Foundation
 struct ListService  {
     func fetchData(completion:@escaping ([PokemonAPI]) -> Void) {
-        guard let url = URL(string: "https://pokeapi.co/api/v2/pokemon?limit=100") else { return }
+        guard let url = URL(string: "https://pokeapi.co/api/v2/pokemon?limit=1126") else { return }
         
         URLSession.shared.dataTask(with: url) { (data, response, error) in
             guard let data = data else { return }

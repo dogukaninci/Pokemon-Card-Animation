@@ -4,26 +4,27 @@ class ViewController: UIViewController {
     private let animationHelper = AnimationHelper()
     private var pokemonViewModel = PokemonViewModel()
     private var pokemonNumber = 2
+    private let totalPokemons = 1125
     
     private var containerViewFront = UIView()
     private var imageViewFront = UIImageView()
     private var containerViewBack = UIView()
     private var imageViewBack = UIImageView()
-
+    
     private var hpLabelFront = UILabel()
     private var attackLabelFront = UILabel()
     private var defenceLabelFront = UILabel()
     private var hpFront = UILabel()
     private var attackFront = UILabel()
     private var defenceFront = UILabel()
-
+    
     private var hpLabelBack = UILabel()
     private var attackLabelBack = UILabel()
     private var defenceLabelBack = UILabel()
     private var hpBack = UILabel()
     private var attackBack = UILabel()
     private var defenceBack = UILabel()
-
+    
     private var pokemonNameFront = UILabel()
     private var pokemonNameBack = UILabel()
     
@@ -35,47 +36,20 @@ class ViewController: UIViewController {
     private var regularConstraints: [NSLayoutConstraint] = []
     private var sharedConstraints: [NSLayoutConstraint] = []
     
+    private var constraintActivated: Bool = false
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(red: 172 / 255.0, green: 158 / 255.0, blue: 255 / 255.0, alpha: 1.0)
-        containerViewFront.addSubview(imageViewFront)
-        containerViewFront.addSubview(hpLabelFront)
-        containerViewFront.addSubview(attackLabelFront)
-        containerViewFront.addSubview(defenceLabelFront)
-        containerViewFront.addSubview(hpFront)
-        containerViewFront.addSubview(attackFront)
-        containerViewFront.addSubview(defenceFront)
-        containerViewFront.addSubview(pokemonNameFront)
-        containerViewBack.addSubview(loadingLabel)
         
-        containerViewBack.addSubview(imageViewBack)
-        containerViewBack.addSubview(hpLabelBack)
-        containerViewBack.addSubview(attackLabelBack)
-        containerViewBack.addSubview(defenceLabelBack)
-        containerViewBack.addSubview(hpBack)
-        containerViewBack.addSubview(attackBack)
-        containerViewBack.addSubview(defenceBack)
-        containerViewBack.addSubview(pokemonNameBack)
-        
-        view.addSubview(containerViewFront)
-        view.addSubview(containerViewBack)
-        view.addSubview(reloadButton)
+        addViews()
         
         setupLayout()
         
-        NSLayoutConstraint.activate(sharedConstraints)
         layoutTrait(traitCollection: UIScreen.main.traitCollection)
         
-        let frontCardRecognizer = UITapGestureRecognizer(target: self, action: #selector(frontCardTapped))
-        let backCardRecognizer = UITapGestureRecognizer(target: self, action: #selector(backCardTapped))
-        let reloadButtonRecognizer = UITapGestureRecognizer(target: self, action: #selector(reloadTapped))
-        containerViewFront.isUserInteractionEnabled = true
-        containerViewBack.isUserInteractionEnabled = true
-        reloadButton.isUserInteractionEnabled = true
-        containerViewFront.addGestureRecognizer(frontCardRecognizer)
-        containerViewBack.addGestureRecognizer(backCardRecognizer)
-        reloadButton.addGestureRecognizer(reloadButtonRecognizer)
+        setupTapRecognizers()
         
         pokemonViewModel.fetchItems {
             self.initializeView()
@@ -83,55 +57,59 @@ class ViewController: UIViewController {
     }
     
     @objc func frontCardTapped(_ sender:UIButton){
-        self.animationHelper.firstAnimation(frontView: containerViewFront, backView: containerViewBack) {
-            let pokemon = self.pokemonViewModel.pokemonListWithDetails[self.pokemonNumber]
-            if let hp = pokemon.detail.stats?[0].baseStat {
-                self.hpFront.text = String(hp)
-            }
-            if let attack = pokemon.detail.stats?[1].baseStat {
-                self.attackFront.text = String(attack)
-            }
-            if let defence = pokemon.detail.stats?[2].baseStat {
-                self.defenceFront.text = String(defence)
-            }
-            self.pokemonNameFront.text = pokemon.name
-            if let imageString = pokemon.detail.sprites?.frontDefault {
-                if let imageUrl = URL(string: imageString) {
-                    if let data = try? Data(contentsOf: imageUrl) {
-                        if let image = UIImage(data: data) {
-                            self.imageViewFront.image = image
+        if(pokemonNumber != totalPokemons) {
+            self.animationHelper.firstAnimation(frontView: containerViewFront, backView: containerViewBack) {
+                let pokemon = self.pokemonViewModel.pokemonListWithDetails[self.pokemonNumber]
+                if let hp = pokemon.detail.stats?[0].baseStat {
+                    self.hpFront.text = String(hp)
+                }
+                if let attack = pokemon.detail.stats?[1].baseStat {
+                    self.attackFront.text = String(attack)
+                }
+                if let defence = pokemon.detail.stats?[2].baseStat {
+                    self.defenceFront.text = String(defence)
+                }
+                self.pokemonNameFront.text = pokemon.name
+                if let imageString = pokemon.detail.sprites?.frontDefault {
+                    if let imageUrl = URL(string: imageString) {
+                        if let data = try? Data(contentsOf: imageUrl) {
+                            if let image = UIImage(data: data) {
+                                self.imageViewFront.image = image
+                            }
                         }
                     }
                 }
             }
+            pokemonNumber += 1
         }
-        pokemonNumber += 1
         
     }
     @objc func backCardTapped(_ sender:UIButton){
-        self.animationHelper.secondAnimation(frontView: containerViewBack, backView: containerViewFront) {
-            let pokemon = self.pokemonViewModel.pokemonListWithDetails[self.pokemonNumber]
-            if let hp = pokemon.detail.stats?[0].baseStat {
-                self.hpBack.text = String(hp)
-            }
-            if let attack = pokemon.detail.stats?[1].baseStat {
-                self.attackBack.text = String(attack)
-            }
-            if let defence = pokemon.detail.stats?[2].baseStat {
-                self.defenceBack.text = String(defence)
-            }
-            self.pokemonNameBack.text = pokemon.name
-            if let imageString = pokemon.detail.sprites?.frontDefault {
-                if let imageUrl = URL(string: imageString) {
-                    if let data = try? Data(contentsOf: imageUrl) {
-                        if let image = UIImage(data: data) {
-                            self.imageViewBack.image = image
+        if(pokemonNumber != totalPokemons) {
+            self.animationHelper.secondAnimation(frontView: containerViewBack, backView: containerViewFront) {
+                let pokemon = self.pokemonViewModel.pokemonListWithDetails[self.pokemonNumber]
+                if let hp = pokemon.detail.stats?[0].baseStat {
+                    self.hpBack.text = String(hp)
+                }
+                if let attack = pokemon.detail.stats?[1].baseStat {
+                    self.attackBack.text = String(attack)
+                }
+                if let defence = pokemon.detail.stats?[2].baseStat {
+                    self.defenceBack.text = String(defence)
+                }
+                self.pokemonNameBack.text = pokemon.name
+                if let imageString = pokemon.detail.sprites?.frontDefault {
+                    if let imageUrl = URL(string: imageString) {
+                        if let data = try? Data(contentsOf: imageUrl) {
+                            if let image = UIImage(data: data) {
+                                self.imageViewBack.image = image
+                            }
                         }
                     }
                 }
             }
+            pokemonNumber += 1
         }
-        pokemonNumber += 1
     }
     @objc func reloadTapped(_ sender: UIButton) {
         pokemonNumber = 2
@@ -146,8 +124,14 @@ class ViewController: UIViewController {
         attackLabelBack.text = "attack"
         defenceLabelBack.text = "defence"
         loadingLabel.text = ""
+        
         containerViewBack.isHidden = true
         containerViewFront.isHidden = false
+        
+        containerViewFront.isUserInteractionEnabled = true
+        containerViewBack.isUserInteractionEnabled = true
+        reloadButton.isUserInteractionEnabled = true
+        
         let pokemon = self.pokemonViewModel.pokemonListWithDetails[0]
         if let hp = pokemon.detail.stats?[0].baseStat {
             hpFront.text = String(hp)
@@ -189,7 +173,42 @@ class ViewController: UIViewController {
             }
         }
     }
-    
+    private func addViews() {
+        containerViewFront.addSubview(imageViewFront)
+        containerViewFront.addSubview(hpLabelFront)
+        containerViewFront.addSubview(attackLabelFront)
+        containerViewFront.addSubview(defenceLabelFront)
+        containerViewFront.addSubview(hpFront)
+        containerViewFront.addSubview(attackFront)
+        containerViewFront.addSubview(defenceFront)
+        containerViewFront.addSubview(pokemonNameFront)
+        
+        containerViewBack.addSubview(loadingLabel)
+        
+        containerViewBack.addSubview(imageViewBack)
+        containerViewBack.addSubview(hpLabelBack)
+        containerViewBack.addSubview(attackLabelBack)
+        containerViewBack.addSubview(defenceLabelBack)
+        containerViewBack.addSubview(hpBack)
+        containerViewBack.addSubview(attackBack)
+        containerViewBack.addSubview(defenceBack)
+        containerViewBack.addSubview(pokemonNameBack)
+        
+        view.addSubview(containerViewFront)
+        view.addSubview(containerViewBack)
+        view.addSubview(reloadButton)
+    }
+    private func setupTapRecognizers() {
+        let frontCardRecognizer = UITapGestureRecognizer(target: self, action: #selector(frontCardTapped))
+        let backCardRecognizer = UITapGestureRecognizer(target: self, action: #selector(backCardTapped))
+        let reloadButtonRecognizer = UITapGestureRecognizer(target: self, action: #selector(reloadTapped))
+        containerViewFront.addGestureRecognizer(frontCardRecognizer)
+        containerViewBack.addGestureRecognizer(backCardRecognizer)
+        reloadButton.addGestureRecognizer(reloadButtonRecognizer)
+        containerViewFront.isUserInteractionEnabled = false
+        containerViewBack.isUserInteractionEnabled = false
+        reloadButton.isUserInteractionEnabled = false
+    }
     private func setupLayout() {
         sharedConstraints.append(contentsOf: [
             reloadButton.heightAnchor.constraint(equalToConstant: 72),
@@ -197,50 +216,185 @@ class ViewController: UIViewController {
             reloadButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 48),
             reloadButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
             
-            containerViewFront.topAnchor.constraint(equalTo: view.topAnchor, constant: 182),
-            containerViewFront.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -182),
-            containerViewFront.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 45),
-            containerViewFront.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -45),
+            containerViewFront.heightAnchor.constraint(equalToConstant: 480),
+            containerViewFront.widthAnchor.constraint(equalToConstant: 300),
+            containerViewFront.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            containerViewFront.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             
-            containerViewBack.topAnchor.constraint(equalTo: view.topAnchor, constant: 182),
-            containerViewBack.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -182),
-            containerViewBack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 45),
-            containerViewBack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -45)
-
+            containerViewBack.heightAnchor.constraint(equalToConstant: 480),
+            containerViewBack.widthAnchor.constraint(equalToConstant: 300),
+            containerViewBack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            containerViewBack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            
+            hpFront.leftAnchor.constraint(equalTo: containerViewFront.leftAnchor, constant: 18),
+            hpFront.bottomAnchor.constraint(equalTo: containerViewFront.bottomAnchor, constant: -23),
+            hpFront.topAnchor.constraint(equalTo: containerViewFront.topAnchor, constant: 419),
+            hpFront.rightAnchor.constraint(equalTo: containerViewFront.rightAnchor, constant: -194),
+            
+            hpLabelFront.leftAnchor.constraint(equalTo: containerViewFront.leftAnchor, constant: 18),
+            hpLabelFront.bottomAnchor.constraint(equalTo: containerViewFront.bottomAnchor, constant: -61),
+            hpLabelFront.topAnchor.constraint(equalTo: containerViewFront.topAnchor, constant: 398),
+            hpLabelFront.rightAnchor.constraint(equalTo: containerViewFront.rightAnchor, constant: -194),
+            
+            attackFront.centerXAnchor.constraint(equalTo: containerViewFront.centerXAnchor),
+            attackFront.bottomAnchor.constraint(equalTo: containerViewFront.bottomAnchor, constant: -23),
+            attackFront.topAnchor.constraint(equalTo: containerViewFront.topAnchor, constant: 419),
+            
+            attackLabelFront.centerXAnchor.constraint(equalTo: containerViewFront.centerXAnchor),
+            attackLabelFront.bottomAnchor.constraint(equalTo: containerViewFront.bottomAnchor, constant: -61),
+            attackLabelFront.topAnchor.constraint(equalTo: containerViewFront.topAnchor, constant: 398),
+            
+            defenceFront.leftAnchor.constraint(equalTo: containerViewFront.leftAnchor, constant: 194),
+            defenceFront.bottomAnchor.constraint(equalTo: containerViewFront.bottomAnchor, constant: -23),
+            defenceFront.topAnchor.constraint(equalTo: containerViewFront.topAnchor, constant: 419),
+            defenceFront.rightAnchor.constraint(equalTo: containerViewFront.rightAnchor, constant: -18),
+            
+            defenceLabelFront.leftAnchor.constraint(equalTo: containerViewFront.leftAnchor, constant: 194),
+            defenceLabelFront.bottomAnchor.constraint(equalTo: containerViewFront.bottomAnchor, constant: -61),
+            defenceLabelFront.topAnchor.constraint(equalTo: containerViewFront.topAnchor, constant: 398),
+            defenceLabelFront.rightAnchor.constraint(equalTo: containerViewFront.rightAnchor, constant: -18),
+            
+            hpBack.leftAnchor.constraint(equalTo: containerViewBack.leftAnchor, constant: 18),
+            hpBack.bottomAnchor.constraint(equalTo: containerViewBack.bottomAnchor, constant: -23),
+            hpBack.topAnchor.constraint(equalTo: containerViewBack.topAnchor, constant: 419),
+            hpBack.rightAnchor.constraint(equalTo: containerViewBack.rightAnchor, constant: -194),
+            
+            hpLabelBack.leftAnchor.constraint(equalTo: containerViewBack.leftAnchor, constant: 18),
+            hpLabelBack.bottomAnchor.constraint(equalTo: containerViewBack.bottomAnchor, constant: -61),
+            hpLabelBack.topAnchor.constraint(equalTo: containerViewBack.topAnchor, constant: 398),
+            hpLabelBack.rightAnchor.constraint(equalTo: containerViewBack.rightAnchor, constant: -194),
+            
+            attackBack.centerXAnchor.constraint(equalTo: containerViewBack.centerXAnchor),
+            attackBack.bottomAnchor.constraint(equalTo: containerViewBack.bottomAnchor, constant: -23),
+            attackBack.topAnchor.constraint(equalTo: containerViewBack.topAnchor, constant: 419),
+            
+            attackLabelBack.centerXAnchor.constraint(equalTo: containerViewBack.centerXAnchor),
+            attackLabelBack.bottomAnchor.constraint(equalTo: containerViewBack.bottomAnchor, constant: -61),
+            attackLabelBack.topAnchor.constraint(equalTo: containerViewBack.topAnchor, constant: 398),
+            
+            defenceBack.leftAnchor.constraint(equalTo: containerViewBack.leftAnchor, constant: 194),
+            defenceBack.bottomAnchor.constraint(equalTo: containerViewBack.bottomAnchor, constant: -23),
+            defenceBack.topAnchor.constraint(equalTo: containerViewBack.topAnchor, constant: 419),
+            defenceBack.rightAnchor.constraint(equalTo: containerViewBack.rightAnchor, constant: -18),
+            
+            defenceLabelBack.leftAnchor.constraint(equalTo: containerViewBack.leftAnchor, constant: 194),
+            defenceLabelBack.bottomAnchor.constraint(equalTo: containerViewBack.bottomAnchor, constant: -61),
+            defenceLabelBack.topAnchor.constraint(equalTo: containerViewBack.topAnchor, constant: 398),
+            defenceLabelBack.rightAnchor.constraint(equalTo: containerViewBack.rightAnchor, constant: -18),
+            
+            imageViewFront.topAnchor.constraint(equalTo: containerViewFront.topAnchor, constant: 183),
+            imageViewFront.bottomAnchor.constraint(equalTo: containerViewFront.bottomAnchor, constant: -183),
+            imageViewFront.leftAnchor.constraint(equalTo: containerViewFront.leftAnchor, constant: 99),
+            imageViewFront.rightAnchor.constraint(equalTo: containerViewFront.rightAnchor, constant: -99),
+            
+            
+            imageViewBack.topAnchor.constraint(equalTo: containerViewBack.topAnchor, constant: 183),
+            imageViewBack.bottomAnchor.constraint(equalTo: containerViewBack.bottomAnchor, constant: -183),
+            imageViewBack.leftAnchor.constraint(equalTo: containerViewBack.leftAnchor, constant: 99),
+            imageViewBack.rightAnchor.constraint(equalTo: containerViewBack.rightAnchor, constant: -99)
+            
         ])
-
+        
         regularConstraints.append(contentsOf: [
             reloadButton.heightAnchor.constraint(equalToConstant: 72),
             reloadButton.widthAnchor.constraint(equalToConstant: 72),
             reloadButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 48),
             reloadButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
             
-            containerViewFront.topAnchor.constraint(equalTo: view.topAnchor, constant: 182),
-            containerViewFront.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -182),
-            containerViewFront.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 45),
-            containerViewFront.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -45),
+            containerViewFront.heightAnchor.constraint(equalToConstant: 480),
+            containerViewFront.widthAnchor.constraint(equalToConstant: 600),
+            containerViewFront.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            containerViewFront.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             
-            containerViewBack.topAnchor.constraint(equalTo: view.topAnchor, constant: 182),
-            containerViewBack.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -182),
-            containerViewBack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 45),
-            containerViewBack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -45)
+            containerViewBack.heightAnchor.constraint(equalToConstant: 480),
+            containerViewBack.widthAnchor.constraint(equalToConstant: 600),
+            containerViewBack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            containerViewBack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            
+            hpFront.leftAnchor.constraint(equalTo: containerViewFront.leftAnchor, constant: 36),
+            hpFront.bottomAnchor.constraint(equalTo: containerViewFront.bottomAnchor, constant: -23),
+            hpFront.topAnchor.constraint(equalTo: containerViewFront.topAnchor, constant: 419),
+            hpFront.rightAnchor.constraint(equalTo: containerViewFront.rightAnchor, constant: -388),
+            
+            hpLabelFront.leftAnchor.constraint(equalTo: containerViewFront.leftAnchor, constant: 36),
+            hpLabelFront.bottomAnchor.constraint(equalTo: containerViewFront.bottomAnchor, constant: -61),
+            hpLabelFront.topAnchor.constraint(equalTo: containerViewFront.topAnchor, constant: 398),
+            hpLabelFront.rightAnchor.constraint(equalTo: containerViewFront.rightAnchor, constant: -388),
+            
+            attackFront.centerXAnchor.constraint(equalTo: containerViewFront.centerXAnchor),
+            attackFront.bottomAnchor.constraint(equalTo: containerViewFront.bottomAnchor, constant: -23),
+            attackFront.topAnchor.constraint(equalTo: containerViewFront.topAnchor, constant: 419),
+            
+            attackLabelFront.centerXAnchor.constraint(equalTo: containerViewFront.centerXAnchor),
+            attackLabelFront.bottomAnchor.constraint(equalTo: containerViewFront.bottomAnchor, constant: -61),
+            attackLabelFront.topAnchor.constraint(equalTo: containerViewFront.topAnchor, constant: 398),
+            
+            defenceFront.leftAnchor.constraint(equalTo: containerViewFront.leftAnchor, constant: 388),
+            defenceFront.bottomAnchor.constraint(equalTo: containerViewFront.bottomAnchor, constant: -23),
+            defenceFront.topAnchor.constraint(equalTo: containerViewFront.topAnchor, constant: 419),
+            defenceFront.rightAnchor.constraint(equalTo: containerViewFront.rightAnchor, constant: -36),
+            
+            defenceLabelFront.leftAnchor.constraint(equalTo: containerViewFront.leftAnchor, constant: 388),
+            defenceLabelFront.bottomAnchor.constraint(equalTo: containerViewFront.bottomAnchor, constant: -61),
+            defenceLabelFront.topAnchor.constraint(equalTo: containerViewFront.topAnchor, constant: 398),
+            defenceLabelFront.rightAnchor.constraint(equalTo: containerViewFront.rightAnchor, constant: -36),
+            
+            hpBack.leftAnchor.constraint(equalTo: containerViewBack.leftAnchor, constant: 36),
+            hpBack.bottomAnchor.constraint(equalTo: containerViewBack.bottomAnchor, constant: -23),
+            hpBack.topAnchor.constraint(equalTo: containerViewBack.topAnchor, constant: 419),
+            hpBack.rightAnchor.constraint(equalTo: containerViewBack.rightAnchor, constant: -388),
+            
+            hpLabelBack.leftAnchor.constraint(equalTo: containerViewBack.leftAnchor, constant: 36),
+            hpLabelBack.bottomAnchor.constraint(equalTo: containerViewBack.bottomAnchor, constant: -61),
+            hpLabelBack.topAnchor.constraint(equalTo: containerViewBack.topAnchor, constant: 398),
+            hpLabelBack.rightAnchor.constraint(equalTo: containerViewBack.rightAnchor, constant: -388),
+            
+            attackBack.centerXAnchor.constraint(equalTo: containerViewBack.centerXAnchor),
+            attackBack.bottomAnchor.constraint(equalTo: containerViewBack.bottomAnchor, constant: -23),
+            attackBack.topAnchor.constraint(equalTo: containerViewBack.topAnchor, constant: 419),
+            
+            attackLabelBack.centerXAnchor.constraint(equalTo: containerViewBack.centerXAnchor),
+            attackLabelBack.bottomAnchor.constraint(equalTo: containerViewBack.bottomAnchor, constant: -61),
+            attackLabelBack.topAnchor.constraint(equalTo: containerViewBack.topAnchor, constant: 398),
+            
+            defenceBack.leftAnchor.constraint(equalTo: containerViewBack.leftAnchor, constant: 388),
+            defenceBack.bottomAnchor.constraint(equalTo: containerViewBack.bottomAnchor, constant: -23),
+            defenceBack.topAnchor.constraint(equalTo: containerViewBack.topAnchor, constant: 419),
+            defenceBack.rightAnchor.constraint(equalTo: containerViewBack.rightAnchor, constant: -36),
+            
+            defenceLabelBack.leftAnchor.constraint(equalTo: containerViewBack.leftAnchor, constant: 388),
+            defenceLabelBack.bottomAnchor.constraint(equalTo: containerViewBack.bottomAnchor, constant: -61),
+            defenceLabelBack.topAnchor.constraint(equalTo: containerViewBack.topAnchor, constant: 398),
+            defenceLabelBack.rightAnchor.constraint(equalTo: containerViewBack.rightAnchor, constant: -36),
+            
+            imageViewFront.topAnchor.constraint(equalTo: containerViewFront.topAnchor, constant: 140),
+            imageViewFront.bottomAnchor.constraint(equalTo: containerViewFront.bottomAnchor, constant: -140),
+            imageViewFront.leftAnchor.constraint(equalTo: containerViewFront.leftAnchor, constant: 198),
+            imageViewFront.rightAnchor.constraint(equalTo: containerViewFront.rightAnchor, constant: -198),
+            
+            
+            imageViewBack.topAnchor.constraint(equalTo: containerViewBack.topAnchor, constant: 140),
+            imageViewBack.bottomAnchor.constraint(equalTo: containerViewBack.bottomAnchor, constant: -140),
+            imageViewBack.leftAnchor.constraint(equalTo: containerViewBack.leftAnchor, constant: 198),
+            imageViewBack.rightAnchor.constraint(equalTo: containerViewBack.rightAnchor, constant: -198)
+            
         ])
-
+        
         compactConstraints.append(contentsOf: [
             reloadButton.heightAnchor.constraint(equalToConstant: 48),
             reloadButton.widthAnchor.constraint(equalToConstant: 48),
             reloadButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 48),
             reloadButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
             
-            containerViewFront.topAnchor.constraint(equalTo: view.topAnchor, constant: 182),
-            containerViewFront.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -182),
-            containerViewFront.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 45),
-            containerViewFront.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -45),
+            containerViewFront.heightAnchor.constraint(equalToConstant: 480),
+            containerViewFront.widthAnchor.constraint(equalToConstant: 300),
+            containerViewFront.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            containerViewFront.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             
-            containerViewBack.topAnchor.constraint(equalTo: view.topAnchor, constant: 182),
-            containerViewBack.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -182),
-            containerViewBack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 45),
-            containerViewBack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -45)
+            containerViewBack.heightAnchor.constraint(equalToConstant: 480),
+            containerViewBack.widthAnchor.constraint(equalToConstant: 300),
+            containerViewBack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            containerViewBack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
         ])
         
         loadingLabel.text = "Loading..."
@@ -279,6 +433,8 @@ class ViewController: UIViewController {
         pokemonNameFront.textAlignment = .center
         pokemonNameBack.textAlignment = .center
         loadingLabel.textAlignment = .center
+        imageViewFront.contentMode = .scaleAspectFill
+        imageViewBack.contentMode = .scaleAspectFill
         
         containerViewFront.translatesAutoresizingMaskIntoConstraints = false
         containerViewFront.backgroundColor = .white
@@ -318,108 +474,39 @@ class ViewController: UIViewController {
         pokemonNameBack.leftAnchor.constraint(equalTo: containerViewBack.leftAnchor, constant: 30).isActive = true
         pokemonNameBack.rightAnchor.constraint(equalTo: containerViewBack.rightAnchor, constant: -30).isActive = true
         
-        imageViewFront.frame = CGRect(x: 0, y: 0, width: 101.95, height: 114)
-        imageViewFront.contentMode = .scaleAspectFill
-        imageViewFront.topAnchor.constraint(equalTo: containerViewFront.topAnchor, constant: 183).isActive = true
-        imageViewFront.bottomAnchor.constraint(equalTo: containerViewFront.bottomAnchor, constant: -183).isActive = true
-        imageViewFront.leftAnchor.constraint(equalTo: containerViewFront.leftAnchor, constant: 99).isActive = true
-        imageViewFront.rightAnchor.constraint(equalTo: containerViewFront.rightAnchor, constant: -99).isActive = true
-        
-        
-        imageViewBack.frame = CGRect(x: 0, y: 0, width: 101.95, height: 114)
-        imageViewBack.contentMode = .scaleAspectFill
-        imageViewBack.topAnchor.constraint(equalTo: containerViewBack.topAnchor, constant: 183).isActive = true
-        imageViewBack.bottomAnchor.constraint(equalTo: containerViewBack.bottomAnchor, constant: -183).isActive = true
-        imageViewBack.leftAnchor.constraint(equalTo: containerViewBack.leftAnchor, constant: 99).isActive = true
-        imageViewBack.rightAnchor.constraint(equalTo: containerViewBack.rightAnchor, constant: -99).isActive = true
-        
-        hpFront.leftAnchor.constraint(equalTo: containerViewFront.leftAnchor, constant: 18).isActive = true
-        hpFront.bottomAnchor.constraint(equalTo: containerViewFront.bottomAnchor, constant: -23).isActive = true
-        hpFront.topAnchor.constraint(equalTo: containerViewFront.topAnchor, constant: 419).isActive = true
-        hpFront.rightAnchor.constraint(equalTo: containerViewFront.rightAnchor, constant: -194).isActive = true
-        
-        hpLabelFront.leftAnchor.constraint(equalTo: containerViewFront.leftAnchor, constant: 18).isActive = true
-        hpLabelFront.bottomAnchor.constraint(equalTo: containerViewFront.bottomAnchor, constant: -61).isActive = true
-        hpLabelFront.topAnchor.constraint(equalTo: containerViewFront.topAnchor, constant: 398).isActive = true
-        hpLabelFront.rightAnchor.constraint(equalTo: containerViewFront.rightAnchor, constant: -194).isActive = true
-        
-        attackFront.leftAnchor.constraint(equalTo: containerViewFront.leftAnchor, constant: 106).isActive = true
-        attackFront.bottomAnchor.constraint(equalTo: containerViewFront.bottomAnchor, constant: -23).isActive = true
-        attackFront.topAnchor.constraint(equalTo: containerViewFront.topAnchor, constant: 419).isActive = true
-        attackFront.rightAnchor.constraint(equalTo: containerViewFront.rightAnchor, constant: -106).isActive = true
-        
-        attackLabelFront.leftAnchor.constraint(equalTo: containerViewFront.leftAnchor, constant: 106).isActive = true
-        attackLabelFront.bottomAnchor.constraint(equalTo: containerViewFront.bottomAnchor, constant: -61).isActive = true
-        attackLabelFront.topAnchor.constraint(equalTo: containerViewFront.topAnchor, constant: 398).isActive = true
-        attackLabelFront.rightAnchor.constraint(equalTo: containerViewFront.rightAnchor, constant: -106).isActive = true
-        
-        defenceFront.leftAnchor.constraint(equalTo: containerViewFront.leftAnchor, constant: 194).isActive = true
-        defenceFront.bottomAnchor.constraint(equalTo: containerViewFront.bottomAnchor, constant: -23).isActive = true
-        defenceFront.topAnchor.constraint(equalTo: containerViewFront.topAnchor, constant: 419).isActive = true
-        defenceFront.rightAnchor.constraint(equalTo: containerViewFront.rightAnchor, constant: -18).isActive = true
-        
-        defenceLabelFront.leftAnchor.constraint(equalTo: containerViewFront.leftAnchor, constant: 194).isActive = true
-        defenceLabelFront.bottomAnchor.constraint(equalTo: containerViewFront.bottomAnchor, constant: -61).isActive = true
-        defenceLabelFront.topAnchor.constraint(equalTo: containerViewFront.topAnchor, constant: 398).isActive = true
-        defenceLabelFront.rightAnchor.constraint(equalTo: containerViewFront.rightAnchor, constant: -18).isActive = true
-        
-        hpBack.leftAnchor.constraint(equalTo: containerViewBack.leftAnchor, constant: 18).isActive = true
-        hpBack.bottomAnchor.constraint(equalTo: containerViewBack.bottomAnchor, constant: -23).isActive = true
-        hpBack.topAnchor.constraint(equalTo: containerViewBack.topAnchor, constant: 419).isActive = true
-        hpBack.rightAnchor.constraint(equalTo: containerViewBack.rightAnchor, constant: -194).isActive = true
-        
-        hpLabelBack.leftAnchor.constraint(equalTo: containerViewBack.leftAnchor, constant: 18).isActive = true
-        hpLabelBack.bottomAnchor.constraint(equalTo: containerViewBack.bottomAnchor, constant: -61).isActive = true
-        hpLabelBack.topAnchor.constraint(equalTo: containerViewBack.topAnchor, constant: 398).isActive = true
-        hpLabelBack.rightAnchor.constraint(equalTo: containerViewBack.rightAnchor, constant: -194).isActive = true
-        
-        attackBack.leftAnchor.constraint(equalTo: containerViewBack.leftAnchor, constant: 106).isActive = true
-        attackBack.bottomAnchor.constraint(equalTo: containerViewBack.bottomAnchor, constant: -23).isActive = true
-        attackBack.topAnchor.constraint(equalTo: containerViewBack.topAnchor, constant: 419).isActive = true
-        attackBack.rightAnchor.constraint(equalTo: containerViewBack.rightAnchor, constant: -106).isActive = true
-        
-        attackLabelBack.leftAnchor.constraint(equalTo: containerViewBack.leftAnchor, constant: 106).isActive = true
-        attackLabelBack.bottomAnchor.constraint(equalTo: containerViewBack.bottomAnchor, constant: -61).isActive = true
-        attackLabelBack.topAnchor.constraint(equalTo: containerViewBack.topAnchor, constant: 398).isActive = true
-        attackLabelBack.rightAnchor.constraint(equalTo: containerViewBack.rightAnchor, constant: -106).isActive = true
-        
-        defenceBack.leftAnchor.constraint(equalTo: containerViewBack.leftAnchor, constant: 194).isActive = true
-        defenceBack.bottomAnchor.constraint(equalTo: containerViewBack.bottomAnchor, constant: -23).isActive = true
-        defenceBack.topAnchor.constraint(equalTo: containerViewBack.topAnchor, constant: 419).isActive = true
-        defenceBack.rightAnchor.constraint(equalTo: containerViewBack.rightAnchor, constant: -18).isActive = true
-        
-        defenceLabelBack.leftAnchor.constraint(equalTo: containerViewBack.leftAnchor, constant: 194).isActive = true
-        defenceLabelBack.bottomAnchor.constraint(equalTo: containerViewBack.bottomAnchor, constant: -61).isActive = true
-        defenceLabelBack.topAnchor.constraint(equalTo: containerViewBack.topAnchor, constant: 398).isActive = true
-        defenceLabelBack.rightAnchor.constraint(equalTo: containerViewBack.rightAnchor, constant: -18).isActive = true
-        
         containerViewFront.layer.cornerRadius = 36
         containerViewBack.layer.cornerRadius = 36
         
     }
     func layoutTrait(traitCollection:UITraitCollection) {
         if (!sharedConstraints[0].isActive) {
-           
-           NSLayoutConstraint.activate(sharedConstraints)
+            
+            //NSLayoutConstraint.activate(sharedConstraints)
         }
         if traitCollection.horizontalSizeClass == .compact && traitCollection.verticalSizeClass == .regular {
             if regularConstraints.count > 0 && regularConstraints[0].isActive {
                 NSLayoutConstraint.deactivate(regularConstraints)
+                constraintActivated = true
             }
             
             NSLayoutConstraint.activate(compactConstraints)
         } else {
             if compactConstraints.count > 0 && compactConstraints[0].isActive {
                 NSLayoutConstraint.deactivate(compactConstraints)
+                constraintActivated = true
             }
             
             NSLayoutConstraint.activate(regularConstraints)
+            constraintActivated = true
+        }
+        if (!constraintActivated) {
+            NSLayoutConstraint.activate(sharedConstraints)
         }
     }
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-
+        
         super.traitCollectionDidChange(previousTraitCollection)
-
+        
         layoutTrait(traitCollection: traitCollection)
     }
 }
