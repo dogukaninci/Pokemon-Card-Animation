@@ -6,5 +6,5 @@ In this task, I have used https://pokeapi.co to get our data.
 <img src="ipad.gif" alt="My Project GIF" width="500">
 
 ## Preview For Iphone 11
-<img src="iphone.gif" alt="My Project GIF" width="500">
+<img src="iphone.gif" alt="My Project GIF" width="300">
 
