@@ -3,8 +3,8 @@
 In this task, I have used https://pokeapi.co to get our data.
 
 ## Preview For Ipad
-![screen-gif](ipad.gif)
+<img src="ipad.gif" alt="My Project GIF" width="500">
 
 ## Preview For Iphone 11
-![screen-gif](iphone.gif)
+<img src="iphone.gif" alt="My Project GIF" width="500">
 
