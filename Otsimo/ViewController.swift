@@ -31,6 +31,10 @@ class ViewController: UIViewController {
     
     private var loadingLabel = UILabel()
     
+    private var compactConstraints: [NSLayoutConstraint] = []
+    private var regularConstraints: [NSLayoutConstraint] = []
+    private var sharedConstraints: [NSLayoutConstraint] = []
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -59,6 +63,9 @@ class ViewController: UIViewController {
         view.addSubview(reloadButton)
         
         setupLayout()
+        
+        NSLayoutConstraint.activate(sharedConstraints)
+        layoutTrait(traitCollection: UIScreen.main.traitCollection)
         
         let frontCardRecognizer = UITapGestureRecognizer(target: self, action: #selector(frontCardTapped))
         let backCardRecognizer = UITapGestureRecognizer(target: self, action: #selector(backCardTapped))
@@ -184,7 +191,62 @@ class ViewController: UIViewController {
     }
     
     private func setupLayout() {
+        sharedConstraints.append(contentsOf: [
+            reloadButton.heightAnchor.constraint(equalToConstant: 72),
+            reloadButton.widthAnchor.constraint(equalToConstant: 72),
+            reloadButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 48),
+            reloadButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
+            
+            containerViewFront.topAnchor.constraint(equalTo: view.topAnchor, constant: 182),
+            containerViewFront.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -182),
+            containerViewFront.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 45),
+            containerViewFront.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -45),
+            
+            containerViewBack.topAnchor.constraint(equalTo: view.topAnchor, constant: 182),
+            containerViewBack.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -182),
+            containerViewBack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 45),
+            containerViewBack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -45)
+
+        ])
+
+        regularConstraints.append(contentsOf: [
+            reloadButton.heightAnchor.constraint(equalToConstant: 72),
+            reloadButton.widthAnchor.constraint(equalToConstant: 72),
+            reloadButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 48),
+            reloadButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
+            
+            containerViewFront.topAnchor.constraint(equalTo: view.topAnchor, constant: 182),
+            containerViewFront.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -182),
+            containerViewFront.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 45),
+            containerViewFront.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -45),
+            
+            containerViewBack.topAnchor.constraint(equalTo: view.topAnchor, constant: 182),
+            containerViewBack.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -182),
+            containerViewBack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 45),
+            containerViewBack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -45)
+        ])
+
+        compactConstraints.append(contentsOf: [
+            reloadButton.heightAnchor.constraint(equalToConstant: 48),
+            reloadButton.widthAnchor.constraint(equalToConstant: 48),
+            reloadButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 48),
+            reloadButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
+            
+            containerViewFront.topAnchor.constraint(equalTo: view.topAnchor, constant: 182),
+            containerViewFront.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -182),
+            containerViewFront.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 45),
+            containerViewFront.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -45),
+            
+            containerViewBack.topAnchor.constraint(equalTo: view.topAnchor, constant: 182),
+            containerViewBack.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -182),
+            containerViewBack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 45),
+            containerViewBack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -45)
+        ])
+        
         loadingLabel.text = "Loading..."
+        
+        reloadButton.image = UIImage(named: "reload")
+        reloadButton.contentMode = .scaleAspectFit
         
         hpFront.font = UIFont.systemFont(ofSize: 32)
         attackFront.font = UIFont.systemFont(ofSize: 32)
@@ -246,13 +308,6 @@ class ViewController: UIViewController {
         loadingLabel.leftAnchor.constraint(equalTo: containerViewFront.leftAnchor, constant: 30).isActive = true
         loadingLabel.rightAnchor.constraint(equalTo: containerViewFront.rightAnchor, constant: -30).isActive = true
         
-        reloadButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 48).isActive = true
-        reloadButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -748).isActive = true
-        reloadButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
-        reloadButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -326).isActive = true
-        reloadButton.image = UIImage(named: "reload")
-        reloadButton.contentMode = .scaleAspectFit
-        
         pokemonNameFront.topAnchor.constraint(equalTo: containerViewFront.topAnchor, constant: 18).isActive = true
         pokemonNameFront.bottomAnchor.constraint(equalTo: containerViewFront.bottomAnchor, constant: -433).isActive = true
         pokemonNameFront.leftAnchor.constraint(equalTo: containerViewFront.leftAnchor, constant: 30).isActive = true
@@ -263,11 +318,6 @@ class ViewController: UIViewController {
         pokemonNameBack.leftAnchor.constraint(equalTo: containerViewBack.leftAnchor, constant: 30).isActive = true
         pokemonNameBack.rightAnchor.constraint(equalTo: containerViewBack.rightAnchor, constant: -30).isActive = true
         
-        containerViewFront.topAnchor.constraint(equalTo: view.topAnchor, constant: 182).isActive = true
-        containerViewFront.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -182).isActive = true
-        containerViewFront.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 45).isActive = true
-        containerViewFront.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -45).isActive = true
-        
         imageViewFront.frame = CGRect(x: 0, y: 0, width: 101.95, height: 114)
         imageViewFront.contentMode = .scaleAspectFill
         imageViewFront.topAnchor.constraint(equalTo: containerViewFront.topAnchor, constant: 183).isActive = true
@@ -275,10 +325,6 @@ class ViewController: UIViewController {
         imageViewFront.leftAnchor.constraint(equalTo: containerViewFront.leftAnchor, constant: 99).isActive = true
         imageViewFront.rightAnchor.constraint(equalTo: containerViewFront.rightAnchor, constant: -99).isActive = true
         
-        containerViewBack.topAnchor.constraint(equalTo: view.topAnchor, constant: 182).isActive = true
-        containerViewBack.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -182).isActive = true
-        containerViewBack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 45).isActive = true
-        containerViewBack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -45).isActive = true
         
         imageViewBack.frame = CGRect(x: 0, y: 0, width: 101.95, height: 114)
         imageViewBack.contentMode = .scaleAspectFill
@@ -350,6 +396,31 @@ class ViewController: UIViewController {
         containerViewFront.layer.cornerRadius = 36
         containerViewBack.layer.cornerRadius = 36
         
+    }
+    func layoutTrait(traitCollection:UITraitCollection) {
+        if (!sharedConstraints[0].isActive) {
+           
+           NSLayoutConstraint.activate(sharedConstraints)
+        }
+        if traitCollection.horizontalSizeClass == .compact && traitCollection.verticalSizeClass == .regular {
+            if regularConstraints.count > 0 && regularConstraints[0].isActive {
+                NSLayoutConstraint.deactivate(regularConstraints)
+            }
+            
+            NSLayoutConstraint.activate(compactConstraints)
+        } else {
+            if compactConstraints.count > 0 && compactConstraints[0].isActive {
+                NSLayoutConstraint.deactivate(compactConstraints)
+            }
+            
+            NSLayoutConstraint.activate(regularConstraints)
+        }
+    }
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+
+        super.traitCollectionDidChange(previousTraitCollection)
+
+        layoutTrait(traitCollection: traitCollection)
     }
 }
 

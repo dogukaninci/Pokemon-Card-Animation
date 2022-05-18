@@ -54,6 +54,7 @@ struct AnimationHelper {
         
         let firstScene = frontView.layer.transform
         let secondScene = backView.layer.transform
+        
         let transform = makeRotateRoute(scene: secondScene, xAngle: -93, yAngle: -2.7, zAngle: 5)
         backView.layer.transform = makeRotateRoute(scene: transform, xAngle: 180, yAngle: 0, zAngle: 0)
         
