@@ -1,4 +1,4 @@
-# Otsimo Study Case
+# Pokemon Card Animation
 
 In this task, I have used https://pokeapi.co to get our data.
 
@@ -21,5 +21,5 @@ In this task, I have used https://pokeapi.co to get our data.
   
   ### Contact
 
-Questions? Feel free to [email me](mailto:dogukaninci93@gmail.com?subject=Come%20Start%20Tomorrow) and I’ll answer ASAP.
+Questions? Feel free to [email me](mailto:dogukaninci93@gmail.com) and I’ll answer ASAP.
 
